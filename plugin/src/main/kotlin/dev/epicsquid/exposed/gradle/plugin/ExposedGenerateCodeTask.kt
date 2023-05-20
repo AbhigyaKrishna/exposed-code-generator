@@ -151,6 +151,14 @@ abstract class ExposedGenerateCodeTask : DefaultTask() {
 
 	@get:Input
 	@get:Option(
+		option = "schemas",
+		description = "List of schemas to include when generating code"
+	)
+	@get:Optional
+	abstract val schemas: ListProperty<String>
+
+	@get:Input
+	@get:Option(
 		option = "ignoreTables",
 		description = "List of tables to ignore when generating code"
 	)
@@ -193,6 +201,7 @@ abstract class ExposedGenerateCodeTask : DefaultTask() {
 					value.idColumnClassName
 				)
 			}.toMap(),
+			schemas.getOrElse(emptyList()),
 			ignoreTables.getOrElse(emptyList()),
 			enums.asMap.map { (key, value) ->
 				key to EnumColumnConfig(

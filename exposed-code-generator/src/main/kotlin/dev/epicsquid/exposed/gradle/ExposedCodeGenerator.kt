@@ -14,7 +14,6 @@ import java.io.File
 import org.jetbrains.exposed.sql.Table as ExposedTable
 
 
-// TODO support schemas
 /**
  * Generates files containing Exposed code for given [tables] using config [configuration] for a given DB [dialect].
  */
@@ -29,13 +28,15 @@ class ExposedCodeGenerator {
 		dialect: DBDialect? = null
 	) {
 		this.configuration = config
-		this.tables = tables.filter { it.fullName !in configuration.ignoreTables }
+		this.tables = tables.filter { if (configuration.schemas.isNotEmpty()) it.schema.name in configuration.schemas else true }
+			.filter { it.fullName !in configuration.ignoreTables }
 		this.dialect = dialect
 	}
 
 	constructor(tables: List<Table>, configFileName: String, dialect: DBDialect? = null) {
 		this.configuration = ConfigLoader().loadConfigOrThrow(files = listOf(File(configFileName)))
-		this.tables = tables.filter { it.fullName !in configuration.ignoreTables }
+		this.tables = tables.filter { if (configuration.schemas.isNotEmpty()) it.schema.name in configuration.schemas else true }
+			.filter { it.fullName !in configuration.ignoreTables }
 		this.dialect = dialect
 	}
 

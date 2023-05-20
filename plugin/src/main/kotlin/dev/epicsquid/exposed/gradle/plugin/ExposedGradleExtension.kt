@@ -32,6 +32,7 @@ abstract class ExposedGradleExtension @Inject constructor(
 	var customMappings: NamedDomainObjectContainer<CustomColumnMapping> = objects.domainObjectContainer(
 		CustomColumnMapping::class.java
 	)
+	var schemas: List<String> = listOf()
 	var ignoreTables: List<String> = listOf()
 	var enums: NamedDomainObjectContainer<EnumMapping> = objects.domainObjectContainer(
 		EnumMapping::class.java

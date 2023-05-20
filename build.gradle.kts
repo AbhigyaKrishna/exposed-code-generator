@@ -25,6 +25,6 @@ tasks.withType<DependencyUpdatesTask> {
 
 fun isNonStable(version: String) = "^[0-9,.v-]+(-r)?$".toRegex().matches(version).not()
 
-tasks.register("clean", Delete::class.java) {
+tasks.register<Delete>("clean") {
 	delete(rootProject.buildDir)
 }
