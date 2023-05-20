@@ -63,10 +63,10 @@ data class ColumnInfo(val column: Column, private val data: TableBuilderData) {
 
 		fun initializeInteger() {
 			when (column.columnDataType.name.lowercase()) {
-				"tinyint" -> initializeColumnParameters(Byte::class, getExposedFunction("byte"))
-				"smallint", "int2" -> initializeColumnParameters(Short::class, getExposedFunction("short"))
-				"int8" -> initializeColumnParameters(Long::class, getExposedFunction("long"))
-				else -> initializeColumnParameters(Int::class, getExposedFunction("integer"))
+				"tinyint" -> initializeColumnParameters(Byte::class, Table::byte)
+				"smallint", "int2" -> initializeColumnParameters(Short::class, Table::short)
+				"int8" -> initializeColumnParameters(Long::class, Table::long)
+				else -> initializeColumnParameters(Int::class, Table::integer)
 			}
 		}
 
@@ -75,10 +75,10 @@ data class ColumnInfo(val column: Column, private val data: TableBuilderData) {
 			if (name.contains("decimal") || name.contains("numeric")) {
 				initializeColumnParameters(
 					BigDecimal::class,
-					getExposedFunction("decimal")
+					Table::decimal
 				)
 			} else {
-				initializeColumnParameters(Double::class, getExposedFunction("double"))
+				initializeColumnParameters(Double::class, Table::double)
 			}
 		}
 
@@ -86,12 +86,12 @@ data class ColumnInfo(val column: Column, private val data: TableBuilderData) {
 			val name = column.columnDataType.name.lowercase()
 			when {
 				name.contains("varchar") || name.contains("varying") ->
-					initializeColumnParameters(String::class, getExposedFunction("varchar"))
+					initializeColumnParameters(String::class, Table::varchar)
 
 				name.contains("char") ->
 					initializeColumnParameters(String::class, exposedChar)
 
-				name.contains("text") -> initializeColumnParameters(String::class, getExposedFunction("text"))
+				name.contains("text") -> initializeColumnParameters(String::class, Table::text)
 				name.contains("time") ->
 					initializeColumnParameters(dateTimeProvider.dateTimeClass, dateTimeProvider.dateTimeTableFun())
 
@@ -101,7 +101,7 @@ data class ColumnInfo(val column: Column, private val data: TableBuilderData) {
 				name.contains("binary") || name.contains("bytea") ->
 					initializeColumnParameters(ByteArray::class, exposedBinary)
 				// this is what SQLite occasionally uses for single precision floating point numbers
-				name.contains("single") -> initializeColumnParameters(Float::class, getExposedFunction("float"))
+				name.contains("single") -> initializeColumnParameters(Float::class, Table::float)
 			}
 		}
 
@@ -125,15 +125,15 @@ data class ColumnInfo(val column: Column, private val data: TableBuilderData) {
 		} else {
 			when (column.columnDataType.typeMappedClass) {
 				Integer::class.javaObjectType -> initializeInteger()
-				Long::class.javaObjectType -> initializeColumnParameters(Long::class, getExposedFunction("long"))
-				BigDecimal::class.javaObjectType -> initializeColumnParameters(BigDecimal::class, getExposedFunction("decimal"))
-				Float::class.javaObjectType -> initializeColumnParameters(Float::class, getExposedFunction("float"))
+				Long::class.javaObjectType -> initializeColumnParameters(Long::class, Table::long)
+				BigDecimal::class.javaObjectType -> initializeColumnParameters(BigDecimal::class, Table::decimal)
+				Float::class.javaObjectType -> initializeColumnParameters(Float::class, Table::float)
 				Double::class.javaObjectType -> initializeDouble()
-				Boolean::class.javaObjectType -> initializeColumnParameters(Boolean::class, getExposedFunction("bool"))
+				Boolean::class.javaObjectType -> initializeColumnParameters(Boolean::class, Table::bool)
 				String::class.javaObjectType -> initializeString()
-				Clob::class.javaObjectType -> initializeColumnParameters(String::class, getExposedFunction("text"))
-				Blob::class.javaObjectType -> initializeColumnParameters(ExposedBlob::class, getExposedFunction("blob"))
-				UUID::class.javaObjectType -> initializeColumnParameters(UUID::class, getExposedFunction("uuid"))
+				Clob::class.javaObjectType -> initializeColumnParameters(String::class, Table::text)
+				Blob::class.javaObjectType -> initializeColumnParameters(ExposedBlob::class, Table::blob)
+				UUID::class.javaObjectType -> initializeColumnParameters(UUID::class, Table::uuid)
 				Date::class.javaObjectType, dateTimeProvider.dateClass.javaObjectType ->
 					initializeColumnParameters(dateTimeProvider.dateClass, dateTimeProvider.dateTableFun())
 
@@ -142,7 +142,7 @@ data class ColumnInfo(val column: Column, private val data: TableBuilderData) {
 
 				else -> {
 					when {
-						name.contains("uuid") -> initializeColumnParameters(UUID::class, getExposedFunction("uuid"))
+						name.contains("uuid") -> initializeColumnParameters(UUID::class, Table::uuid)
 						// can be 'varbinary'
 						name.contains("binary") || name.contains("bytea") -> {
 							initializeColumnParameters(ByteArray::class, exposedBinary)
